@@ -5,11 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prueba 1</title>
-    <link rel="stylesheet" href="/css/library-style.css">
-    <link rel="stylesheet" href="https://library.service24gps.com/css/library-style.css">
-    <link rel="stylesheet" href="https://library.service24gps.com/platform-font/css/platform-font.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
     
-  <script type="module" crossorigin src="/agente_web/assets/index-I6fiOTdV.js"></script>
+  <script type="module" crossorigin src="/agente_web/assets/index-BFx76lNs.js"></script>
+  <link rel="stylesheet" crossorigin href="/agente_web/assets/index-CoMNFuNV.css">
 </head>
 <body >
 
@@ -22,7 +21,7 @@
         </div>
         <!-- Selector de Voz -->
         <div class="hc-voice-selector">
-            <i class="i-mic-on ic-orange" style="font-size: 0.8rem; opacity: 0.7;"></i>
+            <i data-lucide="mic" class="ic-orange" style="width: 14px; height: 14px; opacity: 0.7;"></i>
             <select id="voice-select">
                 <option value="Kore" selected>Voz: Kore (Default)</option>
                 <option value="Aoede">Voz: Aoede</option>
@@ -52,13 +51,13 @@
                     <button class="icon-btn mic-btn-wrap" id="mic-btn">
                         <span class="mic-wave-bar" style="--d:0"></span>
                         <span class="mic-wave-bar" style="--d:1"></span>
-                        <i class="i-play ic-orange ic-x2"></i>
+                        <i id="mic-icon" data-lucide="play" class="ic-orange"></i>
                         <span class="mic-wave-bar" style="--d:2"></span>
                         <span class="mic-wave-bar" style="--d:3"></span>
                     </button>
                     <textarea id="user-input" rows="1" placeholder="Escribe tu mensaje..."></textarea>
                     <button class="icon-btn send-btn" id="send-btn" style="color: var(--orange);">
-                        <i class="i-send ic-orange ic-x2"></i>
+                        <i data-lucide="send-horizontal" class="ic-orange"></i>
                     </button>
                 </div>
                 <p class="disclaimer">Sistema de soporte asistido por IA - RedGps</p>
@@ -66,9 +65,9 @@
 
             <div id="global-token-counter" style="font-size: 12px; color: #888; text-align: center; margin-bottom: 10px; opacity: 0.8;">
                 <span style="margin-right: 8px; font-weight: bold; color: #aaa;">SESIÓN:</span>
-                <span><i class="i-chevron-t ic-green"></i> <strong id="global-token-in">0</strong> <span style="opacity: 0.7;">(<span id="global-cost-in">$0.000000</span>)</span></span> |
-                <span><i class="i-chevron-d ic-red"></i> <strong id="global-token-out">0</strong> <span style="opacity: 0.7;">(<span id="global-cost-out">$0.000000</span>)</span></span> |
-                <span> <i class="i-geofence ic-white"></i> <strong id="global-token-total">0</strong> <span style="font-weight:bold;">(<span id="global-cost-total">$0.000000</span>)</span></span>
+                <span><i data-lucide="chevron-up" class="ic-green" style="width: 12px; height: 12px;"></i> <strong id="global-token-in">0</strong> <span style="opacity: 0.7;">(<span id="global-cost-in">$0.000000</span>)</span></span> |
+                <span><i data-lucide="chevron-down" class="ic-red" style="width: 12px; height: 12px;"></i> <strong id="global-token-out">0</strong> <span style="opacity: 0.7;">(<span id="global-cost-out">$0.000000</span>)</span></span> |
+                <span> <i data-lucide="activity" class="ic-white" style="width: 12px; height: 12px;"></i> <strong id="global-token-total">0</strong> <span style="font-weight:bold;">(<span id="global-cost-total">$0.000000</span>)</span></span>
             </div>
         </div>
     </div>
