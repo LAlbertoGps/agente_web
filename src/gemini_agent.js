@@ -45,6 +45,7 @@ function crearTextChat() {
 // ─── Estado de voz ───────────────────────────────────────────────────────────
 let audioContext, session, stream;
 let isConnected = false;
+let isConnecting = false;
 export const isVoiceActive = () => isConnected;
 let isMuted = false;
 let nextPlayTime = 0;
@@ -124,10 +125,10 @@ export async function handleSendText(text) {
 // ============================================================================
 export async function iniciarAgenteVoz() {
     showVoiceOverlay();
-    if (isConnected) return;
+    if (isConnected || isConnecting) return;
 
     try {
-
+        isConnecting = true;
         isMuted = false;
         nextPlayTime = 0;
 
@@ -251,29 +252,44 @@ export async function iniciarAgenteVoz() {
                         updateTokenCounter(totalTokensIn, totalTokensOut, totalCostoIn, totalCostoOut, totalCostoSesion);
                     }
                 },
-                onerror: (err) => console.error('Gemini Live error:', err),
-                onclose: () => cerrarAgenteVoz()
+                onerror: (err) => {
+                    console.error('Gemini Live error:', err);
+                    // Si hay un error crítico, cerramos la sesión
+                    cerrarAgenteVoz();
+                },
+                onclose: () => {
+                    console.log('Gemini Live connection closed');
+                    cerrarAgenteVoz();
+                }
             }
         });
 
 
         isConnected = true;
+        isConnecting = false;
 
         workletNode.port.onmessage = (event) => {
             if (!isConnected || !session) return;
             try {
                 const pcmData = floatTo16BitPCM(event.data);
                 const base64Audio = arrayBufferToBase64(pcmData);
-                session.sendRealtimeInput({ audio: { data: base64Audio, mimeType: 'audio/pcm;rate=16000' } });
+                
+                // Verificamos si la sesión sigue activa antes de enviar
+                if (session && typeof session.sendRealtimeInput === 'function') {
+                    session.sendRealtimeInput({ 
+                        audio: { data: base64Audio, mimeType: 'audio/pcm;rate=16000' } 
+                    });
+                }
             } catch (err) {
-                console.error('Error enviando audio:', err);
-                isConnected = false;
+                console.error('Error enviando audio (WebSocket cerrado?):', err);
+                // Si falla el envío, cerramos para limpiar estado
+                cerrarAgenteVoz();
             }
         };
 
     } catch (error) {
         console.error('Error Gemini voz:', error);
-
+        isConnecting = false;
         cerrarAgenteVoz();
     }
 }
@@ -287,6 +303,7 @@ export function toggleSilenciar() {
 
 export function cerrarAgenteVoz() {
     isConnected = false;
+    isConnecting = false;
     isMuted = false;
     nextPlayTime = 0;
     userTranscriptId = null;
