@@ -49,6 +49,7 @@ let isConnecting = false;
 export const isVoiceActive = () => isConnected;
 let isMuted = false;
 let nextPlayTime = 0;
+let audioSources = []; // Rastro de fuentes de audio para interrupción
 
 // Acumuladores para transcripción del turno actual
 let userTranscriptId = null;   // id del mensaje de usuario en construcción
@@ -218,7 +219,7 @@ export async function iniciarAgenteVoz() {
                     }
 
                     if (response.serverContent?.interrupted) {
-                        nextPlayTime = 0;
+                        stopAudio();
                         aiMsgId = null;
                         aiTextBuffer = '';
                     }
@@ -311,13 +312,43 @@ export function cerrarAgenteVoz() {
     aiTextBuffer = '';
     hideVoiceOverlay();
 
-    if (stream) stream.getTracks().forEach(t => t.stop());
-    if (audioContext) audioContext.close();
-    stream = null;
-    audioContext = null;
+    if (session) {
+        try {
+            session.close();
+        } catch (e) {
+            console.error('Error cerrando sesión:', e);
+        }
+        session = null;
+    }
+
+    stopAudio();
+
+    if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+    }
+
+    if (audioContext) {
+        try {
+            audioContext.close();
+        } catch (e) {
+            console.error('Error cerrando AudioContext:', e);
+        }
+        audioContext = null;
+    }
 
     setMicMuted(false);
 
+}
+
+function stopAudio() {
+    audioSources.forEach(source => {
+        try {
+            source.stop();
+        } catch (e) {}
+    });
+    audioSources = [];
+    nextPlayTime = 0;
 }
 
 // ─── Auxiliares de audio (igual que en tu main.js original) ──────────────────
@@ -354,6 +385,11 @@ function playPCM16(base64Data) {
     const source = audioContext.createBufferSource();
     source.buffer = buffer;
     source.connect(audioContext.destination);
+
+    source.onended = () => {
+        audioSources = audioSources.filter(s => s !== source);
+    };
+    audioSources.push(source);
 
     if (nextPlayTime < audioContext.currentTime) nextPlayTime = audioContext.currentTime;
     source.start(nextPlayTime);
