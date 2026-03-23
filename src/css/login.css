@@ -108,3 +108,29 @@
 .hidden {
     display: none !important;
 }
+
+/* --- ADAPTACIÓN MÓVIL --- */
+@media (max-width: 480px) {
+    .login-container {
+        padding: 1.5rem;
+        border-radius: 16px;
+    }
+
+    .login-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-group input {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+
+    .login-btn {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+}
