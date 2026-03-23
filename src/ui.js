@@ -44,6 +44,8 @@ export const $ = {
     // Engine Selection
     btnGemini:      document.getElementById('btn-gemini'),
     btnOpenai:      document.getElementById('btn-openai'),
+    btnHibrido:     document.getElementById('btn-hibrido'),
+    
 };
 
 // ─── Control de Pantallas ────────────────────────────────────────────────────
@@ -59,11 +61,18 @@ export function setEngineUI(engine) {
     if (engine === 'gemini') {
         $.btnGemini.classList.add('active-gemini');
         $.btnOpenai.classList.remove('active-openai');
+        $.btnHibrido.classList.remove('active-hibrido');
         updateVoiceSelector('gemini');
-    } else {
+    } else if (engine === 'openai') {
         $.btnGemini.classList.remove('active-gemini');
         $.btnOpenai.classList.add('active-openai');
+        $.btnHibrido.classList.remove('active-hibrido');
         updateVoiceSelector('openai');
+    } else if (engine === 'hibrido') {
+        $.btnGemini.classList.remove('active-gemini');
+        $.btnOpenai.classList.remove('active-openai');
+        $.btnHibrido.classList.add('active-hibrido');
+        updateVoiceSelector('hibrido');
     }
 }
 
@@ -85,6 +94,9 @@ export function updateVoiceSelector(engine) {
             { value: 'coral', text: 'Voz: Coral' },
             { value: 'sage', text: 'Voz: Sage' },
             { value: 'verse', text: 'Voz: Verse' }
+        ],
+        hibrido: [
+           
         ]
     };
 

@@ -367,6 +367,12 @@ textarea {
     border: 1px solid #10a37f;
 }
 
+.toggle-btn.active-hibrido {
+    background: #1026a3; /* OpenAI Green */
+    color: white;
+    border: 1px solid #1026a3;
+}
+
 
 
 

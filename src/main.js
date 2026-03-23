@@ -17,6 +17,7 @@ import { ejecutarHerramienta } from './api.js';
 
 import * as GeminiAgent from './gemini_agent.js';
 import * as OpenAIAgent from './openai_agent.js';
+import * as HybridAgent from './hibrido_agent.js';
 
 let activeAgent = GeminiAgent;
 let currentEngine = 'gemini';
@@ -28,6 +29,8 @@ function init() {
         setEngineUI(currentEngine);
         GeminiAgent.inicializarIA();
         OpenAIAgent.inicializarIA();
+        HybridAgent.inicializarHybridAgent();
+        HybridAgent.setTtsEngine('elevenlabs');
     } else {
         showLogin();
     }
@@ -52,6 +55,8 @@ $.loginSubmit.addEventListener('click', async () => {
     showChat();
     GeminiAgent.inicializarIA();
     OpenAIAgent.inicializarIA();
+    HybridAgent.inicializarHybridAgent();
+
 });
 
 // ─── Cambio de Engine ────────────────────────────────────────────────────────
@@ -65,6 +70,12 @@ $.btnOpenai.addEventListener('click', () => {
     currentEngine = 'openai';
     activeAgent = OpenAIAgent;
     setEngineUI('openai');
+});
+
+$.btnHibrido.addEventListener('click', () => {
+    currentEngine = 'hibrido';
+    activeAgent = HybridAgent;
+    setEngineUI('hibrido');
 });
 
 // ─── Chat de texto ───────────────────────────────────────────────────────────
@@ -105,6 +116,7 @@ $.micBtn.addEventListener('click', () => {
     if (activeAgent.isVoiceActive()) {
         activeAgent.cerrarAgenteVoz();
     } else {
+        console.log('iniciarAgenteVoz' , activeAgent);
         activeAgent.iniciarAgenteVoz();
     }
 });
