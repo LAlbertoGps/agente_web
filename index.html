@@ -8,8 +8,8 @@
     <title>Redgps</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     
-  <script type="module" crossorigin src="/agente_web/assets/index-BHPrdA0U.js"></script>
-  <link rel="stylesheet" crossorigin href="/agente_web/assets/index-BdQPkeGZ.css">
+  <script type="module" crossorigin src="/agente_web/assets/index-BKU8O7hD.js"></script>
+  <link rel="stylesheet" crossorigin href="/agente_web/assets/index-6exrNa4_.css">
 </head>
 <body >
 
@@ -33,6 +33,10 @@
                 <input type="password" id="login-gemini-key" placeholder="AIZA...">
             </div>
             <div class="form-group">
+                <label for="login-openai-key">OpenAI API Key</label>
+                <input type="password" id="login-openai-key" placeholder="sk-...">
+            </div>
+            <div class="form-group">
                 <label for="login-redgps-key">RedGPS API Key</label>
                 <input type="password" id="login-redgps-key" placeholder="API Key de RedGPS">
             </div>
@@ -50,6 +54,17 @@
             <span class="red" style="color: var(--orange)">Red</span><span class="gps" style="color: var(--gray)">Gps</span>
             <span style="font-weight: 300; font-size: 0.9rem; margin-left: 5px; opacity: 0.7;">| Assistant</span>
         </div>
+
+        <!-- Selector de IA -->
+        <div class="engine-toggle">
+            <button class="toggle-btn active-gemini" id="btn-gemini">
+                <i data-lucide="sparkles"></i> Gemini
+            </button>
+            <button class="toggle-btn" id="btn-openai">
+                <i data-lucide="zap"></i> OpenAI
+            </button>
+        </div>
+
         <!-- Selector de Voz -->
         <div class="hc-voice-selector">
             <i data-lucide="mic" class="ic-orange" style="width: 14px; height: 14px; opacity: 0.7;"></i>
