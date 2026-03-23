@@ -11,24 +11,23 @@
 //   main.js         → este archivo, conecta todo
 // ============================================================================
 
-import { $, showChat, showLogin } from './ui.js';
+import { $, showChat, showLogin, setEngineUI } from './ui.js';
 import { hasCredentials, saveCredentials, getCredentials } from './auth.js';
 import { ejecutarHerramienta } from './api.js';
 
-import {
-    handleSendText,
-    iniciarAgenteVoz,
-    toggleSilenciar,
-    cerrarAgenteVoz,
-    isVoiceActive,
-    inicializarIA
-} from './gemini_agent.js';
+import * as GeminiAgent from './gemini_agent.js';
+import * as OpenAIAgent from './openai_agent.js';
+
+let activeAgent = GeminiAgent;
+let currentEngine = 'gemini';
 
 // ─── Inicialización ──────────────────────────────────────────────────────────
 function init() {
     if (hasCredentials()) {
         showChat();
-        inicializarIA();
+        setEngineUI(currentEngine);
+        GeminiAgent.inicializarIA();
+        OpenAIAgent.inicializarIA();
     } else {
         showLogin();
     }
@@ -39,18 +38,33 @@ $.loginSubmit.addEventListener('click', async () => {
     const username = $.loginUsername.value.trim();
     const password = $.loginPassword.value.trim();
     const geminiKey = $.loginGeminiKey.value.trim();
+    const openaiKey = $.loginOpenaiKey.value.trim();
     const redgpsKey = $.loginRedgpsKey.value.trim();
 
-    if (!geminiKey || !redgpsKey) {
-        alert('Por favor, ingresa ambas API Keys.');
+    if (!redgpsKey) {
+        alert('Por favor, ingresa la API Key de RedGPS.');
         return;
     }
 
-    saveCredentials({ username, password, geminiKey, redgpsKey });
-    let token = await ejecutarHerramienta('getToken', {username, password, redgpsKey});
-    console.log("token",token);
+    let token = await ejecutarHerramienta('gettoken', {username, password, redgpsKey});
+    saveCredentials({ username, password, geminiKey, openaiKey, redgpsKey, token: token.data });
+    
     showChat();
-    inicializarIA();
+    GeminiAgent.inicializarIA();
+    OpenAIAgent.inicializarIA();
+});
+
+// ─── Cambio de Engine ────────────────────────────────────────────────────────
+$.btnGemini.addEventListener('click', () => {
+    currentEngine = 'gemini';
+    activeAgent = GeminiAgent;
+    setEngineUI('gemini');
+});
+
+$.btnOpenai.addEventListener('click', () => {
+    currentEngine = 'openai';
+    activeAgent = OpenAIAgent;
+    setEngineUI('openai');
 });
 
 // ─── Chat de texto ───────────────────────────────────────────────────────────
@@ -59,7 +73,7 @@ async function handleSend() {
     if (!text) return;
     $.userInput.value = '';
     $.sendBtn.classList.remove('active');
-    await handleSendText(text);
+    await activeAgent.handleSendText(text);
 }
 
 // ─── Listeners ───────────────────────────────────────────────────────────────
@@ -88,14 +102,14 @@ $.sendBtn.addEventListener('click', () => {
     $.userInput.style.height = '44px';
 });
 $.micBtn.addEventListener('click', () => {
-    if (isVoiceActive()) {
-        cerrarAgenteVoz();
+    if (activeAgent.isVoiceActive()) {
+        activeAgent.cerrarAgenteVoz();
     } else {
-        iniciarAgenteVoz();
+        activeAgent.iniciarAgenteVoz();
     }
 });
-$.btnSilenciar?.addEventListener('click', () => toggleSilenciar());
-$.btnCerrar?.addEventListener('click', () => cerrarAgenteVoz());
+$.btnSilenciar?.addEventListener('click', () => activeAgent.toggleSilenciar());
+$.btnCerrar?.addEventListener('click', () => activeAgent.cerrarAgenteVoz());
 
 // Iniciar aplicación
 init();

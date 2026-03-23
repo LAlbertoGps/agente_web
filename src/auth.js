@@ -34,5 +34,5 @@ export function clearCredentials() {
  */
 export function hasCredentials() {
     const creds = getCredentials();
-    return !!(creds && creds.geminiKey && creds.redgpsKey);
+    return !!(creds && (creds.geminiKey || creds.openaiKey) && creds.redgpsKey);
 }

@@ -14,7 +14,7 @@ let BASE_URL = 'https://qaapi.service24gps.com/api/v1/onassistant';
 function getRedGPSCredentials() {
     const creds = getCredentials();
     return {
-        token: 'Ybmc7/dSGdQlc5FfGiBqWtDp+vi6Zgff6GofvmtII04tpjGAyyrKYQ==',
+        token: creds ? creds.token : 'Ybmc7/dSGdQlc5FfGiBqWtDp+vi6Zgff6GofvmtII04tpjGAyyrKYQ==',
         apikey: creds ? creds.redgpsKey : '1500251af10e18883f4da7041e357ed6'
     };
 }
@@ -42,9 +42,15 @@ async function postRedGPS(endpoint, body) {
         credenciales = CREDENCIALES_LICENCIAMIENTO;
     }
 
-    if(endpoint === 'getToken'){
+    if(endpoint === 'gettoken'){
         BASE_URL = 'https://qaapi.service24gps.com/api/v1';
+    }else{
+        BASE_URL = 'https://qaapi.service24gps.com/api/v1/onassistant';
     }
+
+    console.log('📡 BASE_URL:', `${BASE_URL}/${endpoint}`);
+    console.log('📡 credenciales:', credenciales);
+    console.log('📡 body:', body);
 
     try {
         const response = await fetch(`${BASE_URL}/${endpoint}`, {
@@ -76,8 +82,9 @@ async function postRedGPS(endpoint, body) {
  * @param {*} token token de redgps
  * @returns 
  */
-export async function getToken(username, password ,apikey , token =""){
-    return postRedGPS('getToken', {username, password ,apikey , token});
+export async function gettoken(username, password , token =""){
+    console.log('📡 gettoken:', {username, password , token});
+    return postRedGPS('gettoken', {username, password , token});
 }
 
 
@@ -236,10 +243,10 @@ export async function ejecutarHerramienta(nombre, args) {
             return getReporteLicenciamiento();
         case 'getLicenciamientoByCliente':
             return getLicenciamientoByCliente(args);
-        case 'getToken':
-            return getToken(args.username, args.password, args.apikey, args.token);
+        case 'gettoken':
+            return gettoken(args.username, args.password, args.apikey, args.token);
         default:
             console.warn('⚠️ Herramienta desconocida:', nombre);
             return { error: `Herramienta "${nombre}" no reconocida.` };
-    }
+    } 
 }

@@ -361,6 +361,12 @@ textarea {
     border: 1px solid orange;
 }
 
+.toggle-btn.active-openai {
+    background: #10a37f; /* OpenAI Green */
+    color: white;
+    border: 1px solid #10a37f;
+}
+
 
 
 

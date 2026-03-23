@@ -38,8 +38,12 @@ export const $ = {
     loginUsername:  document.getElementById('login-username'),
     loginPassword:  document.getElementById('login-password'),
     loginGeminiKey: document.getElementById('login-gemini-key'),
+    loginOpenaiKey: document.getElementById('login-openai-key'),
     loginRedgpsKey: document.getElementById('login-redgps-key'),
     loginSubmit:    document.getElementById('login-submit'),
+    // Engine Selection
+    btnGemini:      document.getElementById('btn-gemini'),
+    btnOpenai:      document.getElementById('btn-openai'),
 };
 
 // ─── Control de Pantallas ────────────────────────────────────────────────────
@@ -49,6 +53,43 @@ export function showChat() {
 
 export function showLogin() {
     $.loginScreen.classList.remove('hidden');
+}
+
+export function setEngineUI(engine) {
+    if (engine === 'gemini') {
+        $.btnGemini.classList.add('active-gemini');
+        $.btnOpenai.classList.remove('active-openai');
+        updateVoiceSelector('gemini');
+    } else {
+        $.btnGemini.classList.remove('active-gemini');
+        $.btnOpenai.classList.add('active-openai');
+        updateVoiceSelector('openai');
+    }
+}
+
+export function updateVoiceSelector(engine) {
+    const voices = {
+        gemini: [
+            { value: 'Kore', text: 'Voz: Kore (Default)' },
+            { value: 'Aoede', text: 'Voz: Aoede' },
+            { value: 'Charon', text: 'Voz: Charon' },
+            { value: 'Fenrir', text: 'Voz: Fenrir' },
+            { value: 'Puck', text: 'Voz: Puck' }
+        ],
+        openai: [
+            { value: 'alloy', text: 'Voz: Alloy (Default)' },
+            { value: 'echo', text: 'Voz: Echo' },
+            { value: 'shimmer', text: 'Voz: Shimmer' },
+            { value: 'ash', text: 'Voz: Ash' },
+            { value: 'ballad', text: 'Voz: Ballad' },
+            { value: 'coral', text: 'Voz: Coral' },
+            { value: 'sage', text: 'Voz: Sage' },
+            { value: 'verse', text: 'Voz: Verse' }
+        ]
+    };
+
+    const options = voices[engine] || voices.gemini;
+    $.voiceSelect.innerHTML = options.map(v => `<option value="${v.value}">${v.text}</option>`).join('');
 }
 
 // ─── Mensajes en el chat ──────────────────────────────────────────────────────
