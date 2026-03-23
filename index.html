@@ -7,10 +7,41 @@
     <meta name="referrer" content="no-referrer-when-downgrade">
     <title>Redgps</title>
     <link rel="stylesheet" href="./src/css/chat.css">
+    <link rel="stylesheet" href="./src/css/login.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     
 </head>
 <body >
+
+    <!-- Pantalla de Inicio de Sesión -->
+    <div id="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <h1><span class="red">Red</span><span class="gps">Gps</span> <span>Assistant</span></h1>
+                <p>Configura tu sesión para comenzar</p>
+            </div>
+            <div class="form-group">
+                <label for="login-username">Usuario</label>
+                <input type="text" id="login-username" placeholder="Tu usuario de RedGPS">
+            </div>
+            <div class="form-group">
+                <label for="login-password">Contraseña</label>
+                <input type="password" id="login-password" placeholder="Tu contraseña">
+            </div>
+            <div class="form-group">
+                <label for="login-gemini-key">Gemini API Key</label>
+                <input type="password" id="login-gemini-key" placeholder="AIZA...">
+            </div>
+            <div class="form-group">
+                <label for="login-redgps-key">RedGPS API Key</label>
+                <input type="password" id="login-redgps-key" placeholder="API Key de RedGPS">
+            </div>
+            <button id="login-submit" class="login-btn">
+                <span>Comenzar Chat</span>
+                <i data-lucide="arrow-right"></i>
+            </button>
+        </div>
+    </div>
 
     <!--Header nuevo-->
     <header class="header-custom fix-t">
@@ -38,7 +69,7 @@
             <div id="chat-container">
                 <!-- Mensaje de Bienvenida -->
                 <div class="message ai">
-                    <div class="avatar"><i data-lucide="radio"></i>  </div>
+                    <div class="avatar"><i data-lucide="bot" class="ic-white"></i>  </div>
                     <div class="bubble">
                         Bienvenido al asistente inteligente de <strong>RedGps</strong>. ¿Cómo puedo ayudarte hoy? 
                     </div>

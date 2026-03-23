@@ -11,15 +11,47 @@
 //   main.js         → este archivo, conecta todo
 // ============================================================================
 
-import { $ } from './ui.js';
+import { $, showChat, showLogin } from './ui.js';
+import { hasCredentials, saveCredentials, getCredentials } from './auth.js';
+import { ejecutarHerramienta } from './api.js';
 
 import {
     handleSendText,
     iniciarAgenteVoz,
     toggleSilenciar,
     cerrarAgenteVoz,
-    isVoiceActive
+    isVoiceActive,
+    inicializarIA
 } from './gemini_agent.js';
+
+// ─── Inicialización ──────────────────────────────────────────────────────────
+function init() {
+    if (hasCredentials()) {
+        showChat();
+        inicializarIA();
+    } else {
+        showLogin();
+    }
+}
+
+// ─── Manejo de Login ─────────────────────────────────────────────────────────
+$.loginSubmit.addEventListener('click', async () => {
+    const username = $.loginUsername.value.trim();
+    const password = $.loginPassword.value.trim();
+    const geminiKey = $.loginGeminiKey.value.trim();
+    const redgpsKey = $.loginRedgpsKey.value.trim();
+
+    if (!geminiKey || !redgpsKey) {
+        alert('Por favor, ingresa ambas API Keys.');
+        return;
+    }
+
+    saveCredentials({ username, password, geminiKey, redgpsKey });
+    let token = await ejecutarHerramienta('getToken', {username, password, redgpsKey});
+    console.log("token",token);
+    showChat();
+    inicializarIA();
+});
 
 // ─── Chat de texto ───────────────────────────────────────────────────────────
 async function handleSend() {
@@ -64,3 +96,6 @@ $.micBtn.addEventListener('click', () => {
 });
 $.btnSilenciar?.addEventListener('click', () => toggleSilenciar());
 $.btnCerrar?.addEventListener('click', () => cerrarAgenteVoz());
+
+// Iniciar aplicación
+init();

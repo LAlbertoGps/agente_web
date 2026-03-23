@@ -10,6 +10,7 @@
 import { GoogleGenAI } from '@google/genai';
 import { getSystemPrompt, herramientasGemini } from './prompt.js';
 import { ejecutarHerramienta } from './api.js';
+import { getCredentials } from './auth.js';
 import {
     $,
     addMessage, updateMessage,
@@ -17,7 +18,14 @@ import {
     setMicMuted, updateTokenCounter
 } from './ui.js';
 
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+let ai = null;
+
+export function inicializarIA() {
+    const creds = getCredentials();
+    if (creds && creds.geminiKey) {
+        ai = new GoogleGenAI({ apiKey: creds.geminiKey });
+    }
+}
 
 const MODEL_TEXT = 'gemini-2.5-flash';
 const MODEL_LIVE = 'gemini-2.5-flash-native-audio-preview-12-2025';

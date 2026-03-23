@@ -7,12 +7,17 @@
 // Para cambiar credenciales o URLs, solo editas este archivo.
 // ============================================================================
 
-const BASE_URL = 'https://qaapi.service24gps.com/api/v1/onassistant';
+import { getCredentials } from './auth.js';
 
-const CREDENCIALES = {
-    token: 'Ybmc7/dSGdQlc5FfGiBqWtDp+vi6Zgff6GofvmtII04tpjGAyyrKYQ==',
-    apikey: '1500251af10e18883f4da7041e357ed6'
-};
+let BASE_URL = 'https://qaapi.service24gps.com/api/v1/onassistant';
+
+function getRedGPSCredentials() {
+    const creds = getCredentials();
+    return {
+        token: 'Ybmc7/dSGdQlc5FfGiBqWtDp+vi6Zgff6GofvmtII04tpjGAyyrKYQ==',
+        apikey: creds ? creds.redgpsKey : '1500251af10e18883f4da7041e357ed6'
+    };
+}
 
 const CREDENCIALES_ACTIVOS ={
     apikey:"6024b79f2b985aa87539deb0bc0f80d4",
@@ -27,7 +32,7 @@ const CREDENCIALES_LICENCIAMIENTO ={
 // Helper interno — hace el fetch y maneja errores de forma uniforme
 async function postRedGPS(endpoint, body) {
 
-    let credenciales = CREDENCIALES;
+    let credenciales = getRedGPSCredentials();
 
     if(endpoint === 'getReporteActivos' || endpoint === 'infoVehiculo' || endpoint === 'getRecorridoActivo'){
         credenciales = CREDENCIALES_ACTIVOS;
@@ -35,6 +40,10 @@ async function postRedGPS(endpoint, body) {
 
     if(endpoint === 'getReporteLicenciamiento'){
         credenciales = CREDENCIALES_LICENCIAMIENTO;
+    }
+
+    if(endpoint === 'getToken'){
+        BASE_URL = 'https://qaapi.service24gps.com/api/v1';
     }
 
     try {
@@ -58,6 +67,20 @@ async function postRedGPS(endpoint, body) {
 }
 
 // ── Funciones exportadas ──────────────────────────────────────────────────────
+
+/**
+ * Obtiene el token de redgps para realizar las apis
+ * @param {*} username usuario de redgps
+ * @param {*} password contraseña de redgps
+ * @param {*} apikey apikey de redgps
+ * @param {*} token token de redgps
+ * @returns 
+ */
+export async function getToken(username, password ,apikey , token =""){
+    return postRedGPS('getToken', {username, password ,apikey , token});
+}
+
+
 
 /**
  * Consulta y filtra tareas del usuario.
@@ -213,6 +236,8 @@ export async function ejecutarHerramienta(nombre, args) {
             return getReporteLicenciamiento();
         case 'getLicenciamientoByCliente':
             return getLicenciamientoByCliente(args);
+        case 'getToken':
+            return getToken(args.username, args.password, args.apikey, args.token);
         default:
             console.warn('⚠️ Herramienta desconocida:', nombre);
             return { error: `Herramienta "${nombre}" no reconocida.` };

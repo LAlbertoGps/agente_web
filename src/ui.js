@@ -33,7 +33,23 @@ export const $ = {
     costOut:        document.getElementById('global-cost-out'),
     costTotal:      document.getElementById('global-cost-total'),
     voiceSelect:    document.getElementById('voice-select'),
+    // Login Screen
+    loginScreen:    document.getElementById('login-screen'),
+    loginUsername:  document.getElementById('login-username'),
+    loginPassword:  document.getElementById('login-password'),
+    loginGeminiKey: document.getElementById('login-gemini-key'),
+    loginRedgpsKey: document.getElementById('login-redgps-key'),
+    loginSubmit:    document.getElementById('login-submit'),
 };
+
+// ─── Control de Pantallas ────────────────────────────────────────────────────
+export function showChat() {
+    $.loginScreen.classList.add('hidden');
+}
+
+export function showLogin() {
+    $.loginScreen.classList.remove('hidden');
+}
 
 // ─── Mensajes en el chat ──────────────────────────────────────────────────────
 /**
