@@ -190,3 +190,4 @@ VOZ: "[Cliente] pasó de [base.total] a [actual.total] licencias ([tendencia_pct
      [Si mes_caida: Mayor baja en [mes natural]: [diferencia] unidades.]"
 TEXTO: misma tabla que getReporteLicenciamiento con nombre del cliente como encabezado.
 ⚠️ Nunca para preguntas generales → usa getReporteLicenciamiento.
+

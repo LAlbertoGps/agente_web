@@ -1,0 +1,15 @@
+{
+  "hash": "c20bfbdc",
+  "configHash": "8a7a8af2",
+  "lockfileHash": "d0dccb4a",
+  "browserHash": "00626907",
+  "optimized": {
+    "@google/genai": {
+      "src": "../../node_modules/@google/genai/dist/web/index.mjs",
+      "file": "@google_genai.js",
+      "fileHash": "8e838a7b",
+      "needsInterop": false
+    }
+  },
+  "chunks": {}
+}
