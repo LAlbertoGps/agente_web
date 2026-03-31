@@ -105,7 +105,7 @@ export async function handleSendText(text) {
             } = response.usageMetadata;
 
             // Costos del mensaje actual
-            const costoIn     = ((tIn - tCached) * 0.30 / 1e6) + (tCached * 0.03 / 1e6);
+            const costoIn     = ((tIn - tCached) * 0.30 / 1e6) + (tCached * 0.075 / 1e6);
             const costoOut    = (tOut + tThinking) * 2.50 / 1e6;
             const costoTotal  = costoIn + costoOut;
 
@@ -159,8 +159,6 @@ export async function iniciarAgenteVoz() {
         workletNode.connect(silenceGain);
         silenceGain.connect(audioContext.destination);
 
-
-
         const selectedVoice = $.voiceSelect?.value || 'Kore';
 
         session = await ai.live.connect({
@@ -168,7 +166,7 @@ export async function iniciarAgenteVoz() {
             config: {
                 responseModalities: ['AUDIO'],
                 speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: selectedVoice } } },
-                systemInstruction: { parts: [{ text: getSystemPrompt() }] },
+                systemInstruction: { parts: [{ text: '🔴 MODO VOZ ACTIVO. Responde SOLO con oraciones cortas y naturales. NUNCA uses tablas, listas, markdown, URLs ni IDs numéricos. Máximo 3 oraciones por respuesta salvo que pidan más detalle.' + getSystemPrompt() }] },
                 tools: herramientasGemini,
                 inputAudioTranscription: {},   // ← activa transcripción del usuario
                 outputAudioTranscription: {}   // ← activa transcripción de la IA
@@ -234,7 +232,10 @@ export async function iniciarAgenteVoz() {
 
                     // ── Tokens ───────────────────────────────────────────────────
                     const usage = response.usageMetadata;
+                    console.log("usage", usage);
+                    
                     if (usage) {
+                        
                         let tIn = 0, tOut = 0, costoIn = 0, costoOut = 0;
                         usage.promptTokensDetails?.forEach(d => {
                             tIn += d.tokenCount;

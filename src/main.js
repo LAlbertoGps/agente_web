@@ -72,11 +72,11 @@ $.btnOpenai.addEventListener('click', () => {
     setEngineUI('openai');
 });
 
-$.btnHibrido.addEventListener('click', () => {
-    currentEngine = 'hibrido';
-    activeAgent = HybridAgent;
-    setEngineUI('hibrido');
-});
+// $.btnHibrido.addEventListener('click', () => {
+//     currentEngine = 'hibrido';
+//     activeAgent = HybridAgent;
+//     setEngineUI('hibrido');
+// });
 
 // ─── Chat de texto ───────────────────────────────────────────────────────────
 async function handleSend() {

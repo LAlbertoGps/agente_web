@@ -5,16 +5,40 @@
 // ============================================================================
 
 /**
- * Parseador de markdown simple (solo negritas y saltos de línea)
+ * Parseador de markdown con soporte de tablas, encabezados, negritas y listas.
  * @param {string} text 
  * @returns {string} HTML
  */
 function parseMarkdown(text) {
     if (!text) return '';
-    return text
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Negritas
-        .replace(/^\*\s+(.*)/gm, '<div style="margin-left: 12px;>• $1</div>') // Listas con *
-        .replace(/\n/g, '<br>'); // Saltos de línea
+
+    // ── Tablas markdown (líneas que empiezan con |) ───────────────────────────
+    text = text.replace(/((?:\|.+\|[ \t]*\n?)+)/g, (block) => {
+        const lines = block.trim().split('\n').map(l => l.trim()).filter(l => l);
+        if (lines.length < 2) return block;
+        const isSep = /^\|[\s\-\|:]+\|$/.test(lines[1]);
+        if (!isSep) return block;
+        const headers = lines[0].split('|').filter(c => c.trim() !== '').map(c => `<th>${c.trim()}</th>`).join('');
+        const rows = lines.slice(2).map(row =>
+            '<tr>' + row.split('|').filter(c => c.trim() !== '').map(c => `<td>${c.trim()}</td>`).join('') + '</tr>'
+        ).join('');
+        return `<div style="overflow-x:auto;margin:8px 0"><table class="md-table"><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    });
+
+    // ── Encabezados ───────────────────────────────────────────────────────────
+    text = text.replace(/^### (.+)$/gm, '<h4 class="md-h4">$1</h4>');
+    text = text.replace(/^## (.+)$/gm,  '<h3 class="md-h3">$1</h3>');
+
+    // ── Negritas ──────────────────────────────────────────────────────────────
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+    // ── Listas (- o *) ────────────────────────────────────────────────────────
+    text = text.replace(/^[\*\-]\s+(.*)/gm, '<div style="margin-left:12px">• $1</div>');
+
+    // ── Saltos de línea ───────────────────────────────────────────────────────
+    text = text.replace(/\n/g, '<br>');
+
+    return text;
 }
 
 // ─── Referencias DOM ─────────────────────────────────────────────────────────
@@ -61,17 +85,17 @@ export function setEngineUI(engine) {
     if (engine === 'gemini') {
         $.btnGemini.classList.add('active-gemini');
         $.btnOpenai.classList.remove('active-openai');
-        $.btnHibrido.classList.remove('active-hibrido');
+        // $.btnHibrido.classList.remove('active-hibrido');
         updateVoiceSelector('gemini');
     } else if (engine === 'openai') {
         $.btnGemini.classList.remove('active-gemini');
         $.btnOpenai.classList.add('active-openai');
-        $.btnHibrido.classList.remove('active-hibrido');
+        // $.btnHibrido.classList.remove('active-hibrido');
         updateVoiceSelector('openai');
     } else if (engine === 'hibrido') {
         $.btnGemini.classList.remove('active-gemini');
         $.btnOpenai.classList.remove('active-openai');
-        $.btnHibrido.classList.add('active-hibrido');
+        // $.btnHibrido.classList.add('active-hibrido');
         updateVoiceSelector('hibrido');
     }
 }

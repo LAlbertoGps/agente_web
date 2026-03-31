@@ -15,17 +15,25 @@ import basePrompt from './prompts/base.md?raw';
  */
 export function getSystemPrompt() {
     const ahora = new Date();
+    
+    // REDONDEO: Redondeamos a los 5 minutos más cercanos para activar el CACHING de Google.
+    // Esto hace que el prompt sea "idéntico" durante 5 minutos, ahorrando miles de tokens.
+    const minutosRedondeados = Math.floor(ahora.getMinutes() / 5) * 5;
+    ahora.setMinutes(minutosRedondeados);
+    ahora.setSeconds(0);
+
     const fechaActual = ahora.toLocaleString('es-MX', {
         timeZone: 'America/Mexico_City',
         year: 'numeric', month: '2-digit', day: '2-digit',
-        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour: '2-digit', minute: '2-digit',
         hour12: false
     });
 
-    // Agrega la fecha al inicio del prompt base
-    const contextoTemporal = `[SISTEMA] Fecha/Hora actual: ${fechaActual}. Calcula fechas relativas ("hoy", "mañana") basándote en esta. Usa siempre formato 'YYYY-MM-DD HH:MM:SS' en las herramientas.\n\n`;
+    const contextoTemporal = `[SISTEMA] Fecha/Hora actual aproximada: ${fechaActual}. 
+    Calcula fechas relativas ("hoy", "mañana", "ayer") basándote en esta. 
+    Para las herramientas/API usa SIEMPRE formato 'YYYY-MM-DD HH:MM:SS'.\n\n`;
 
-    return contextoTemporal + basePrompt;
+    return  basePrompt + contextoTemporal;
 }
 
 /**
