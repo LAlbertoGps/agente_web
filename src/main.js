@@ -17,7 +17,8 @@ import { ejecutarHerramienta } from './api.js';
 
 import * as GeminiAgent from './gemini_agent.js';
 import * as OpenAIAgent from './openai_agent.js';
-import * as HybridAgent from './hibrido_agent.js';
+import { iniciarEscuchaNotificaciones } from './firebase.js';
+
 
 let activeAgent = GeminiAgent;
 let currentEngine = 'gemini';
@@ -29,8 +30,7 @@ function init() {
         setEngineUI(currentEngine);
         GeminiAgent.inicializarIA();
         OpenAIAgent.inicializarIA();
-        HybridAgent.inicializarHybridAgent();
-        HybridAgent.setTtsEngine('elevenlabs');
+        iniciarEscuchaNotificaciones();
     } else {
         showLogin();
     }
@@ -49,14 +49,13 @@ $.loginSubmit.addEventListener('click', async () => {
         return;
     }
 
-    let token = await ejecutarHerramienta('gettoken', {username, password, redgpsKey});
+    let token = await ejecutarHerramienta('gettoken', { username, password, redgpsKey });
     saveCredentials({ username, password, geminiKey, openaiKey, redgpsKey, token: token.data });
-    
+
     showChat();
     GeminiAgent.inicializarIA();
     OpenAIAgent.inicializarIA();
-    HybridAgent.inicializarHybridAgent();
-
+    iniciarEscuchaNotificaciones();
 });
 
 // ─── Cambio de Engine ────────────────────────────────────────────────────────
@@ -72,11 +71,6 @@ $.btnOpenai.addEventListener('click', () => {
     setEngineUI('openai');
 });
 
-// $.btnHibrido.addEventListener('click', () => {
-//     currentEngine = 'hibrido';
-//     activeAgent = HybridAgent;
-//     setEngineUI('hibrido');
-// });
 
 // ─── Chat de texto ───────────────────────────────────────────────────────────
 async function handleSend() {
@@ -89,13 +83,12 @@ async function handleSend() {
 
 // ─── Listeners ───────────────────────────────────────────────────────────────
 $.userInput.addEventListener('input', () => {
-    // Auto-resize refinado
-    $.userInput.style.height = '44px'; // Altura base inicial
+    $.userInput.style.height = '44px';
     const newHeight = $.userInput.scrollHeight;
     if (newHeight > 44) {
         $.userInput.style.height = newHeight + 'px';
     }
-    
+
     $.sendBtn.classList.toggle('active', $.userInput.value.trim().length > 0);
 });
 
@@ -103,7 +96,6 @@ $.userInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         handleSend();
-        // Reset height after send
         $.userInput.style.height = '44px';
     }
 });
@@ -112,14 +104,15 @@ $.sendBtn.addEventListener('click', () => {
     handleSend();
     $.userInput.style.height = '44px';
 });
+
 $.micBtn.addEventListener('click', () => {
     if (activeAgent.isVoiceActive()) {
         activeAgent.cerrarAgenteVoz();
     } else {
-        console.log('iniciarAgenteVoz' , activeAgent);
         activeAgent.iniciarAgenteVoz();
     }
 });
+
 $.btnSilenciar?.addEventListener('click', () => activeAgent.toggleSilenciar());
 $.btnCerrar?.addEventListener('click', () => activeAgent.cerrarAgenteVoz());
 

@@ -8,14 +8,17 @@
 // ============================================================================
 
 import { getCredentials } from './auth.js';
+import { enviarNotificacionTarea } from './firebase.js';
 
 let BASE_URL = 'https://qaapi.service24gps.com/api/v1/onassistant';
 
 function getRedGPSCredentials() {
     const creds = getCredentials();
+    console.log('📡 creds:', creds);
     return {
         token: creds ? creds.token : 'Ybmc7/dSGdQlc5FfGiBqWtDp+vi6Zgff6GofvmtII04tpjGAyyrKYQ==',
-        apikey: creds ? creds.redgpsKey : '1500251af10e18883f4da7041e357ed6'
+        apikey: creds ? creds.redgpsKey : '1500251af10e18883f4da7041e357ed6',
+        username: creds ? creds.username : 'sin usuario'
     };
 }
 
@@ -34,7 +37,7 @@ async function postRedGPS(endpoint, body) {
 
     let credenciales = getRedGPSCredentials();
 
-    if(endpoint === 'getReporteActivos' || endpoint === 'infoVehiculo' || endpoint === 'getRecorridoActivo'){
+    if((endpoint === 'getReporteActivos' || endpoint === 'infoVehiculo' || endpoint === 'getRecorridoActivo')){
         credenciales = CREDENCIALES_ACTIVOS;
     }
 
@@ -51,6 +54,8 @@ async function postRedGPS(endpoint, body) {
     console.log('📡 BASE_URL:', `${BASE_URL}/${endpoint}`);
     console.log('📡 credenciales:', credenciales);
     console.log('📡 body:', body);
+    console.log('📡 creds:', credenciales);
+
 
     try {
         const response = await fetch(`${BASE_URL}/${endpoint}`, {
@@ -116,7 +121,17 @@ export async function actualizarTareas(idTarea, estado, prioridad, titulo) {
  */
 export async function crearTareaAPI(args) {
     console.log('📡 crearTarea:', args.titulo);
-    return postRedGPS('crearTarea', args);
+    const response = await postRedGPS('crearTarea', args);
+    if (response && !response.error) {
+        try {
+            if (args.colaboradores) {
+                enviarNotificacionTarea(args.colaboradores, args.titulo, args.descripcion);
+            }
+        } catch (e) {
+            console.error("❌ Error enviando notificación por Firebase:", e);
+        }
+    }
+    return response;
 }
 
 /**
