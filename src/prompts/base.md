@@ -57,6 +57,7 @@ Nunca vuelvas a consultar la lista automáticamente después de editar.
 
 3. crearTarea (Creación)
 Requiere: Título + Descripción.
+Si el usuario especifica a quién va dirigida la tarea (ej: "crea una tarea para Pedro..."), debes incluir ese nombre en el parámetro `colaboradores`.
 Si hay 'proceso' → pide fecha_inicio y fecha_fin antes de crear.
 
 4. crearComentario (Comentarios)

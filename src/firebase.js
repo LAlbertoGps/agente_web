@@ -53,6 +53,15 @@ export function enviarNotificacionTarea(destinatarios, titulo, descripcion) {
     });
 }
 
+// Diccionario de equivalencias: "nombre_natural": "username_redgps"
+const MAPA_COLABORADORES = {
+  "pedro": "pdelgado",
+  "pedro delgado": "pdelgado",
+  "luis alberto": "luis_alberto",
+  "juan": "juan.martinez",
+  "diego": "diego_redgps"
+};
+
 // Bandera para asegurar que la escucha solo se inicialice una vez
 let escuchaActiva = false;
 
@@ -79,13 +88,22 @@ export function iniciarEscuchaNotificaciones() {
         const id = snapshot.key;
         const data = snapshot.val();
         
+        console.log("👀 Firebase onChildAdded detectó un registro:", data);
+        
+        // Traducir nombre natural a username usando el mapa, si no existe usa el nombre tal cual
+        const destinatarioNatural = data.para ? data.para.trim().toLowerCase() : "";
+        const usernameDestinatario = MAPA_COLABORADORES[destinatarioNatural] || destinatarioNatural;
+
         // Validar si la notificación es para mí, no está leída, y es reciente (últimos 30 segundos)
-        const esParaMi = data.para && data.para.trim().toLowerCase() === miUsuario;
-        const esReciente = Date.now() - data.timestamp < 30000;
+        const esParaMi = usernameDestinatario === miUsuario;
+        const diferenciaTiempo = Date.now() - data.timestamp;
+        const esReciente = diferenciaTiempo < 30000; // 30 segundos
+
+        console.log(`🔍 Evaluación para ${miUsuario}: esParaMi=${esParaMi}, leido=${data.leido}, diferenciaTiempo=${diferenciaTiempo}ms, esReciente=${esReciente}`);
 
         if (esParaMi && !data.leido && esReciente) {
-            console.log(`📥 Notificación recibida en tiempo real:`, data);
-
+            console.log(`📥 ¡Notificación aprobada y recibida! Procesando...`);
+            
             // Marcar como leída en Firebase para evitar duplicidad
             const notifRef = ref(db, `notificaciones/${id}`);
             update(notifRef, { leido: true });
@@ -99,9 +117,6 @@ export function iniciarEscuchaNotificaciones() {
     });
 }
 
-/**
- * Reproduce por voz (Síntesis de Voz nativa del navegador) la notificación
- */
 function reproducirNotificacionVoz(data) {
     if (!('speechSynthesis' in window)) {
         console.warn("⚠️ Síntesis de voz no soportada en este navegador.");
@@ -109,20 +124,21 @@ function reproducirNotificacionVoz(data) {
     }
 
     const mensaje = `Hola. ${data.creador} te ha asignado una nueva tarea: ${data.titulo}. El resumen es: ${data.descripcion}`;
+    console.log("🔊 Intentando hablar:", mensaje);
     
     const utterance = new SpeechSynthesisUtterance(mensaje);
     utterance.lang = 'es-MX';
     utterance.rate = 0.95; // Velocidad pausada
 
-    // Cargar las voces de forma segura
-    const voices = window.speechSynthesis.getVoices();
-    const spanishVoice = voices.find(voice => voice.lang.includes('es-'));
-    if (spanishVoice) {
-        utterance.voice = spanishVoice;
-    }
+    // Callbacks de depuración
+    utterance.onstart = () => console.log("🔊 Síntesis de voz: INICIADA");
+    utterance.onend = () => console.log("🔊 Síntesis de voz: FINALIZADA");
+    utterance.onerror = (e) => console.error("❌ Síntesis de voz ERROR:", e.error, e);
 
-    // Cancelar cualquier audio de voz nativa en curso para evitar superposiciones
-    window.speechSynthesis.cancel();
-    
-    window.speechSynthesis.speak(utterance);
+    try {
+        window.speechSynthesis.speak(utterance);
+        console.log("🔊 Comando speechSynthesis.speak enviado al navegador.");
+    } catch (err) {
+        console.error("❌ Excepción al usar speechSynthesis.speak:", err);
+    }
 }
