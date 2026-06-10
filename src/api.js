@@ -80,188 +80,49 @@ async function postRedGPS(endpoint, body) {
 // ── Funciones exportadas ──────────────────────────────────────────────────────
 
 /**
- * Obtiene el token de redgps para realizar las apis
- * @param {*} username usuario de redgps
- * @param {*} password contraseña de redgps
- * @param {*} apikey apikey de redgps
- * @param {*} token token de redgps
- * @returns 
- */
-export async function gettoken(username, password , token =""){
-    console.log('📡 gettoken:', {username, password , token});
-    return postRedGPS('gettoken', {username, password , token});
-}
-
-
-
-/**
- * Consulta y filtra tareas del usuario.
- * @param {Object} filtros - { solo, estado, prioridad, proceso, etapa, area, colaborador }
- */
-export async function getTareasUsuario(filtros = {}) {
-    console.log('📡 getTareas:', filtros);
-    return postRedGPS('getTareas', filtros);
-}
-
-/**
- * Actualiza estado, prioridad o título de una tarea.
- * @param {string} idTarea
- * @param {string} estado
- * @param {string} prioridad
- * @param {string} titulo
- */
-export async function actualizarTareas(idTarea, estado, prioridad, titulo) {
-    console.log('📡 actualizarTareas:', idTarea);
-    return postRedGPS('editarTarea', { idTarea, estado, prioridad, titulo });
-}
-
-/**
- * Crea una nueva tarea con los argumentos que el LLM recopiló.
- * @param {Object} args - { titulo, descripcion, proceso, fecha_inicio, fecha_fin, ... }
- */
-export async function crearTareaAPI(args) {
-    console.log('📡 crearTarea:', args.titulo);
-    const response = await postRedGPS('crearTarea', args);
-    if (response && !response.error) {
-        try {
-            if (args.colaboradores) {
-                enviarNotificacionTarea(args.colaboradores, args.titulo, args.descripcion);
-            }
-        } catch (e) {
-            console.error("❌ Error enviando notificación por Firebase:", e);
-        }
-    }
-    return response;
-}
-
-/**
- * Agrega un comentario a una tarea existente.
- * @param {Object} args - { idtarea, detalle, idproceso, idproceso_etapa }
- */
-export async function crearComentarioAPI(args) {
-    console.log('📡 crearComentario:', args.idtarea);
-    return postRedGPS('crearComentario', {
-        idtarea: args.idtarea,
-        detalle: args.detalle,
-        idproceso: args.idproceso || 0,
-        idproceso_etapa: args.idproceso_etapa || 0
-    });
-}
-
-// ─── Herramientas de Monitoreo ──────────────────────────────────────────────
-
-/**
- * Obtiene el reporte general de activos (reportando / no reportando).
- * @returns {Promise<Object>} respuesta de RedGPS
- */
-export async function getReporteActivos() {
-    console.log('📡 getReporteActivos:');
-    return postRedGPS('getReporteActivos', {});
-}
-
-/**
- * Obtiene información de un vehículo específico.
- * @param {Object} args - { placa }
- */
-export async function infoVehiculo(args) {
-    console.log('📡 infoVehiculo:', args);
-    return postRedGPS('infoVehiculo', {
-        placa: args.placa,
-    });
-}
-
-/**
- * Obtiene el recorrido activo de un vehículo específico.
- * @param {Object} args - { placa }
- */
-export async function getRecorridoActivo(args = {}) {
-    console.log('📡 getRecorridoActivo:', args);
-    return postRedGPS('getRecorridoActivo', {
-        placa: args.placa
-    });
-}
-
-// ─── Herramientas de Facturacion ──────────────────────────────────────────────
-
-/**
- * Obtiene el reporte de facturación con clientes que tienen facturas vencidas.
- * @returns {Promise<Object>} respuesta de RedGPS
- */
-
-export async function getReporteFacturacion() {
-    console.log('📡 getReporteFacturacion:');
-    return postRedGPS('getReporteFacturacion', {});
-}
-
-/**
- * Obtiene las facturas de un cliente específico (ultimas 4max).
- * @param {Object} args - { cliente }
- */
-export async function getFacturasCliente(args = {}) {
-    console.log('📡 getFacturasCliente:', args);
-    return postRedGPS('getFacturasCliente', {
-        cliente: args.cliente
-    });
-}
-
-// ─── Herramientas de Licenciamiento ──────────────────────────────────────────────
-
-/**
- * Obtiene el reporte de licenciamiento con clientes que tienen facturas vencidas.
- * @returns {Promise<Object>} respuesta de RedGPS
- */
-
-export async function getReporteLicenciamiento() {
-    console.log('📡 getReporteLicenciamiento:');
-    return postRedGPS('getReporteLicenciamiento', {});
-}
-
-/**
- * Obtiene las facturas de un cliente específico (ultimas 4max).
- * @param {Object} args - { cliente }
- */
-export async function getLicenciamientoByCliente(args = {}) {
-    console.log('📡 getLicenciamientoByCliente:', args);
-    return postRedGPS('getLicenciamientoByCliente', {
-        cliente: args.cliente
-    });
-}
-
-/**
  * Despachador genérico — recibe el nombre de la herramienta y sus args.
- * Usado por ambos agentes para no repetir el bloque if/else.
- * @param {string} nombre - nombre de la función
- * @param {Object} args   - argumentos del LLM
+ * Usado por ambos agentes y por el login.
+ * @param {string} nombre - nombre de la función ('consultar_backend' o 'gettoken')
+ * @param {Object} args   - argumentos del LLM o del login
  * @returns {Promise<Object>} resultado de la API
  */
 export async function ejecutarHerramienta(nombre, args) {
-    switch (nombre) {
-        case 'getTareas':
-            return getTareasUsuario(args);
-        case 'actualizarTareas':
-            return actualizarTareas(args.idTarea, args.estado, args.prioridad, args.titulo);
-        case 'crearTarea':
-            return crearTareaAPI(args);
-        case 'crearComentario':
-            return crearComentarioAPI(args);
-        case 'getReporteActivos':
-            return getReporteActivos();
-        case 'infoVehiculo':
-            return infoVehiculo(args);
-        case 'getRecorridoActivo':
-            return getRecorridoActivo(args);
-        case 'getReporteFacturacion':
-            return getReporteFacturacion();
-        case 'getFacturasCliente':
-            return getFacturasCliente(args);
-        case 'getReporteLicenciamiento':
-            return getReporteLicenciamiento();
-        case 'getLicenciamientoByCliente':
-            return getLicenciamientoByCliente(args);
-        case 'gettoken':
-            return gettoken(args.username, args.password, args.apikey, args.token);
-        default:
-            console.warn('⚠️ Herramienta desconocida:', nombre);
-            return { error: `Herramienta "${nombre}" no reconocida.` };
-    } 
+    if (nombre === 'gettoken') {
+        console.log('📡 gettoken:', args);
+        return postRedGPS('gettoken', {
+            username: args.username,
+            password: args.password,
+            token: args.token || ""
+        });
+    }
+
+    if (nombre === 'consultar_backend') {
+        let parametrosJSON = {};
+        try {
+            parametrosJSON = args.parametros ? JSON.parse(args.parametros) : {};
+        } catch (e) {
+            console.error("Error parseando parámetros JSON:", e);
+            return { error: "Parámetros inválidos (no es un JSON válido)" };
+        }
+
+        console.log(`📡 consultar_backend [${args.intencion}]:`, parametrosJSON);
+        
+        const response = await postRedGPS(args.intencion, parametrosJSON);
+
+        // Lógica especial post-ejecución (Notificaciones de Firebase para crearTarea)
+        if (args.intencion === 'crearTarea' && response && !response.error) {
+            try {
+                if (parametrosJSON.colaboradores) {
+                    enviarNotificacionTarea(parametrosJSON.colaboradores, parametrosJSON.titulo, parametrosJSON.descripcion);
+                }
+            } catch (e) {
+                console.error("❌ Error enviando notificación por Firebase:", e);
+            }
+        }
+
+        return response;
+    }
+
+    console.warn('⚠️ Herramienta desconocida:', nombre);
+    return { error: `Herramienta "${nombre}" no reconocida.` };
 }
