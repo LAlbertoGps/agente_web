@@ -37,11 +37,14 @@ async function postRedGPS(endpoint, body) {
 
     let credenciales = getRedGPSCredentials();
 
-    if((endpoint === 'getReporteActivos' || endpoint === 'infoVehiculo' || endpoint === 'getRecorridoActivo')){
+    // Si pasamos por el enrutador universal, la intención real viene en el body
+    const intencionReal = (endpoint === 'consultar_backend') ? body.intencion : endpoint;
+
+    if((intencionReal === 'getReporteActivos' || intencionReal === 'infoVehiculo' || intencionReal === 'getRecorridoActivo')){
         credenciales = CREDENCIALES_ACTIVOS;
     }
 
-    if(endpoint === 'getReporteLicenciamiento'){
+    if(intencionReal === 'getReporteLicenciamiento'){
         credenciales = CREDENCIALES_LICENCIAMIENTO;
     }
 
@@ -54,7 +57,6 @@ async function postRedGPS(endpoint, body) {
     console.log('📡 BASE_URL:', `${BASE_URL}/${endpoint}`);
     console.log('📡 credenciales:', credenciales);
     console.log('📡 body:', body);
-    console.log('📡 creds:', credenciales);
 
 
     try {
