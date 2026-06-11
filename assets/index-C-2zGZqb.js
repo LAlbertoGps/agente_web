@@ -35,31 +35,23 @@ ${h}`)}return r}),Mn=KC(Vc);class Oc extends Gc{create(e,n){var i;const{api_vers
 # CATÁLOGO DE ENDPOINTS (consultar_backend)
 Usa la herramienta \`consultar_backend\` enviando la intención y los parámetros en formato JSON string. Aquí están las intenciones que soporta el backend y los datos esperados:
 
+## Funciones disponibles
 
-- **getTareas**: {"solo": 1|0, "estado": "...", "prioridad": "...", "proceso": "...", "etapa": "...", "area": "...", "colaborador": "..."}
-- **actualizarTareas**: {"idTarea": "...", "estado": "...", "prioridad": "...", "titulo": "..."} (Requiere confirmación previa del usuario)
-- **crearTarea**: {"titulo": "...", "descripcion": "...", "colaboradores": "...", "proceso": "...", "fecha_inicio": "YYYY-MM-DD HH:MM:SS", "fecha_fin": "..."}
-- **crearComentario**: {"idtarea": 123, "detalle": "...", "idproceso": 0, "idproceso_etapa": 0}
-- **getReporteActivos**: {}
-- **infoVehiculo**: {"placa": "..."}
-- **getRecorridoActivo**: {"idVehiculo": "..."}
-- **getReporteFacturacion**: {}
-- **getFacturasCliente**: {"cliente": "..."}
-- **getReporteLicenciamiento**: {}
-- **getLicenciamientoByCliente**: {"cliente": "..."}
+- **getAllAssets**: Obtiene la lista completa de vehículos del usuario. No requiere parámetros.
+  - Parámetros: {}
+
+- **getRecorrido**: Obtiene el recorrido de un vehículo en un rango de fechas.
+  - Parámetros: { "imei": "", "from": "YYYY-MM-DD", "to": "YYYY-MM-DD" }
+  - IMPORTANTE: El campo "imei" corresponde a la PATENTE/PLACA del vehículo.
 
 
-/mobile
+*## Reglas estrictas
 
-  /Vehiculos
-    -getVehiculos
-    -
-  /Pedidos
-    -getPedidos
+1. Si el usuario pide información de un vehículo específico (recorrido, historial, etc.) y NO tienes su imei/patente, PRIMERO debes llamar a getAllAssets para obtener la lista y buscar el vehículo por nombre, patente o descripción.
 
+2. NUNCA inventes un imei. Siempre obtenlo de la respuesta de getAllAssets.
 
-
-
+3. Para fechas, si el usuario no especifica dia de inicio o fin, usa el dia actual para "from" y "to".
 
 
 *Nota: Puedes invocar consultar_backend múltiples veces en paralelo si el usuario pide cosas distintas (ej: crear una tarea Y consultar un vehículo al mismo tiempo).*`;function Fs(){const t=new Date,e=Math.floor(t.getMinutes()/5)*5;t.setMinutes(e),t.setSeconds(0);const i=`[SISTEMA] Fecha/Hora actual aproximada: ${t.toLocaleString("es-MX",{timeZone:"America/Mexico_City",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:!1})}. 
