@@ -109,7 +109,10 @@ export async function ejecutarHerramienta(nombre, args) {
 
         console.log(`📡 consultar_backend [${args.intencion}]:`, parametrosJSON);
         
-        const response = await postRedGPS(args.intencion, parametrosJSON);
+        const response = await postRedGPS('consultar_backend', {
+            intencion: args.intencion,
+            parametros: args.parametros
+        });
 
         // Lógica especial post-ejecución (Notificaciones de Firebase para crearTarea)
         if (args.intencion === 'crearTarea' && response && !response.error) {
