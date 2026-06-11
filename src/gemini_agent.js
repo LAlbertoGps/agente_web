@@ -77,17 +77,29 @@ export async function handleSendText(text) {
     try {
         let response = await textChat.sendMessage({ message: text });
 
-        // ── Tool call ────────────────────────────────────────────────────
-        if (response.functionCalls?.length > 0) {
-            const llamada = response.functionCalls[0];
+        // ── Tool calls ────────────────────────────────────────────────────
+        let functionCalls = response.functionCalls;
+        while (functionCalls?.length > 0) {
+            updateMessage(idTemporal, `<span style="color:var(--orange);opacity:0.8;">Obteniendo múltiples datos...</span>`);
 
-            updateMessage(idTemporal, `<span style="color:var(--orange);opacity:0.8;">Obteniendo datos...</span>`);
+            // Procesar todas las herramientas de esta ronda en paralelo
+            const functionResponses = await Promise.all(functionCalls.map(async (llamada) => {
+                const resultadoBD = await ejecutarHerramienta(llamada.name, llamada.args);
+                return {
+                    functionResponse: {
+                        name: llamada.name,
+                        response: resultadoBD
+                    }
+                };
+            }));
 
-            const resultadoBD = await ejecutarHerramienta(llamada.name, llamada.args);
-
+            // Enviar TODAS las respuestas juntas a la IA
             response = await textChat.sendMessage({
-                message: [{ functionResponse: { name: llamada.name, response: resultadoBD } }]
+                message: functionResponses
             });
+
+            // Si la IA decide pedir MÁS cosas, continuará en el bucle
+            functionCalls = response.functionCalls;
         }
 
         // ── Respuesta final ──────────────────────────────────────────────
@@ -209,13 +221,21 @@ export async function iniciarAgenteVoz() {
                     }
 
                     // ── Tool call ────────────────────────────────────────────────
-                    if (response.toolCall) {
-                        for (const llamada of response.toolCall.functionCalls) {
-                            const resultadoBD = await ejecutarHerramienta(llamada.name, llamada.args);
-                            session.sendToolResponse({
-                                functionResponses: [{ id: llamada.id, name: llamada.name, response: resultadoBD }]
-                            });
-                        }
+                    if (response.toolCall && response.toolCall.functionCalls) {
+                        const functionResponses = await Promise.all(
+                            response.toolCall.functionCalls.map(async (llamada) => {
+                                const resultadoBD = await ejecutarHerramienta(llamada.name, llamada.args);
+                                return {
+                                    id: llamada.id,
+                                    name: llamada.name,
+                                    response: resultadoBD
+                                };
+                            })
+                        );
+                        
+                        session.sendToolResponse({
+                            functionResponses: functionResponses
+                        });
                     }
 
                     // ── Turn complete: cerrar burbuja de IA ─────────────────────
