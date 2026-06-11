@@ -16,8 +16,8 @@ function getRedGPSCredentials() {
     const creds = getCredentials();
     console.log('📡 creds:', creds);
     return {
-        token: creds ? creds.token : 'Ybmc7/dSGdQlc5FfGiBqWtDp+vi6Zgff6GofvmtII04tpjGAyyrKYQ==',
-        apikey: creds ? creds.redgpsKey : '1500251af10e18883f4da7041e357ed6',
+        token: creds ? creds.token : 'wBcWYNxVw+Z6UtWbX3ISxXQZ6GOA6BNBd3JII5clpjD0RoaGjWle8pe7UyufjOvI',
+        apikey: creds ? creds.redgpsKey : '6024b79f2b985aa87539deb0bc0f80d4',
         username: creds ? creds.username : 'sin usuario'
     };
 }
@@ -94,7 +94,7 @@ export async function ejecutarHerramienta(nombre, args) {
         return postRedGPS('gettoken', {
             username: args.username,
             password: args.password,
-            token: args.token || ""
+            token: args.token || "wBcWYNxVw+Z6UtWbX3ISxXQZ6GOA6BNBd3JII5clpjD0RoaGjWle8pe7UyufjOvI"
         });
     }
 
