@@ -41,7 +41,7 @@ Usa la herramienta \`consultar_backend\` enviando la intención y los parámetro
   - Parámetros: {}
 
 - **getRecorrido**: Obtiene el recorrido de un vehículo en un rango de fechas.
-  - Parámetros: { "imei": "", "from": "YYYY-MM-DD", "to": "YYYY-MM-DD" }
+  - Parámetros: { "imei": "", "from": "YYYY-MM-DD 00:00:00", "to": "YYYY-MM-DD 23:59:59" }
   - IMPORTANTE: El campo "imei" corresponde a la PATENTE/PLACA del vehículo.
 
 
