@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RedGps - AI Assistant</title>
+    <title>RedGps - AI Assistant v2</title>
     <link rel="stylesheet" href="https://library.service24gps.com/css/library-style.css">
     <link rel="stylesheet" href="https://library.service24gps.com/platform-font/css/platform-font.css">
     <link rel="stylesheet" href="./src/css/chat.css">
 </head>
 <body>
+
 
     <header>
         <div class="logo">
